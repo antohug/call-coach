@@ -1,58 +1,303 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coach by Antoine</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1f1a; color: #e8ede8; min-height: 100vh; }
 
-  const { transcript, repName, accountName } = req.body;
+.header { background: #141814; border-bottom: 1px solid #2a3a2a; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 14px; }
+.header-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #4a9a4a; }
+.header-text h1 { font-size: 17px; font-weight: 600; color: #e8ede8; letter-spacing: -0.01em; }
+.header-text p { font-size: 12px; color: #6a8a6a; margin-top: 1px; }
+.header-badge { margin-left: auto; background: #1e3a1e; border: 1px solid #2e5a2e; color: #4a9a4a; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
 
-  if (!transcript) {
-    return res.status(400).json({ error: 'Transcript is required' });
-  }
+.container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+.intro { margin-bottom: 1.5rem; }
+.intro h2 { font-size: 22px; font-weight: 600; color: #e8ede8; margin-bottom: 6px; }
+.intro p { font-size: 14px; color: #6a8a6a; line-height: 1.5; }
 
-  const SYSTEM_PROMPT = `You are an elite sales coach. Analyze the sales call transcript using these exact frameworks and return ONLY valid JSON â€” no preamble, no markdown, no explanation.
+.card { background: #1e261e; border: 1px solid #2a3a2a; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+.card-label { font-size: 12px; font-weight: 500; color: #4a9a4a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
 
-TAPO upfront social contract: Time (confirmed availability?), Attendees (all on call?), Purpose (goal stated and agreed, co-built agenda?), Outcome (clear exit criteria and next step stated upfront?).
+textarea { width: 100%; min-height: 180px; resize: vertical; font-size: 13px; padding: 12px 14px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; line-height: 1.6; font-family: inherit; transition: border-color 0.2s; }
+textarea:focus { outline: none; border-color: #4a9a4a; }
+textarea::placeholder { color: #3a5a3a; }
 
-Command of the Message discovery: Before State (current situation + strategic priorities understood?), Negative Consequences (problem, business impact, personal impact, metrics?), Ideal State (prospect painted their own perfect scenario?), PBO (success metrics, measurement, timeline, urgency?), Required Capabilities (unique needs, integrations, decision process?), Positioning (solution tied to their specific pain, differentiated, proof point, customer story?), Closing (vision match reached? next step scheduled? disqualification handled?).
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.field-group label { font-size: 12px; color: #6a8a6a; display: block; margin-bottom: 5px; }
+.field-hint { font-size: 11px; color: #3a5a3a; margin-top: 3px; }
+input[type="text"] { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; font-family: inherit; transition: border-color 0.2s; }
+input[type="text"]:focus { outline: none; border-color: #4a9a4a; }
+input[type="text"]::placeholder { color: #3a5a3a; }
 
-Qualitative: exec priorities alignment, talk ratio estimate (rep % only), question quality (lawyer-style investigative follow-ups?), quantification (impact of change AND status quo?), compelling event identified?, decision authority mapped?.
+.analyze-btn { width: 100%; padding: 13px; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; background: #3a7a3a; color: #e8ede8; cursor: pointer; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.01em; transition: background 0.2s; }
+.analyze-btn:hover:not(:disabled) { background: #4a9a4a; }
+.analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-MEDDICC: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion, Competition.
+.error-msg { color: #e87a7a; font-size: 13px; padding: 10px 14px; background: #2a1a1a; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #4a2a2a; line-height: 1.5; }
 
-Return this exact JSON:
-{"overall_score":0,"overall_summary":"","talk_ratio_estimate":0,"tapo":{"time":{"score":0,"finding":"","gap":""},"attendees":{"score":0,"finding":"","gap":""},"purpose":{"score":0,"finding":"","gap":""},"outcome":{"score":0,"finding":"","gap":""}},"command_of_message":{"before_state":{"score":0,"finding":"","gap":""},"negative_consequences":{"score":0,"finding":"","gap":""},"ideal_state":{"score":0,"finding":"","gap":""},"pbo":{"score":0,"finding":"","gap":""},"required_capabilities":{"score":0,"finding":"","gap":""},"positioning":{"score":0,"finding":"","gap":""},"closing":{"score":0,"finding":"","gap":""}},"qualitative":{"exec_priorities":{"score":0,"finding":""},"question_quality":{"score":0,"finding":""},"quantification":{"score":0,"finding":""},"compelling_event":{"score":0,"finding":""},"decision_authority":{"score":0,"finding":""}},"meddicc":{"metrics":{"status":"missing","note":""},"economic_buyer":{"status":"missing","note":""},"decision_criteria":{"status":"missing","note":""},"decision_process":{"status":"missing","note":""},"identify_pain":{"status":"missing","note":""},"champion":{"status":"missing","note":""},"competition":{"status":"missing","note":""}},"top_coaching_moments":["","",""],"priorities_for_next_call":["","",""]}`;
+.results { display: none; }
+.results.visible { display: block; }
+
+.report-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 0; }
+.report-logos { display: flex; align-items: center; gap: 10px; }
+.logo-wrap { width: 44px; height: 44px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #2a3a2a; flex-shrink: 0; }
+.logo-wrap img { width: 36px; height: 36px; object-fit: contain; }
+.logo-divider { color: #3a5a3a; font-size: 18px; font-weight: 300; }
+.rep-photo-sm { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #4a9a4a; flex-shrink: 0; }
+.rep-photo-placeholder { width: 44px; height: 44px; border-radius: 50%; background: #1e3a1e; border: 2px solid #2e5a2e; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #4a9a4a; flex-shrink: 0; }
+
+.summary-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.summary-text h3 { font-size: 16px; font-weight: 600; color: #e8ede8; margin-bottom: 5px; }
+.summary-text p { font-size: 13px; color: #7a9a7a; line-height: 1.65; }
+.summary-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.score-circle { width: 70px; height: 70px; border-radius: 50%; border: 3px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.score-num { font-size: 22px; font-weight: 700; line-height: 1; }
+.score-lbl { font-size: 9px; color: #6a8a6a; margin-top: 1px; }
+
+.section-title { font-size: 11px; font-weight: 600; color: #4a9a4a; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: #2a3a2a; }
+
+.badge { display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #1a3a1a; color: #5ab85a; border: 1px solid #2a5a2a; }
+.badge-amber { background: #3a2a0a; color: #c8881a; border: 1px solid #5a4a1a; }
+.badge-red { background: #3a1a1a; color: #e87a7a; border: 1px solid #5a2a2a; }
+
+.bucket { border: 1px solid #2a3a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; background: #161e16; }
+.bucket:hover { border-color: #3a5a3a; }
+.bucket-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.bucket-name { font-size: 13px; font-weight: 500; color: #c8dec8; }
+.bucket-body { font-size: 13px; color: #7a9a7a; line-height: 1.6; }
+.gap-item { font-size: 12px; color: #e87a7a; display: flex; gap: 6px; margin-top: 6px; align-items: flex-start; padding: 6px 8px; background: #2a1a1a; border-radius: 6px; }
+
+.meddicc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.meddicc-item { border: 1px solid #2a3a2a; border-radius: 10px; padding: 10px 12px; background: #161e16; }
+.meddicc-letter { font-size: 20px; font-weight: 700; line-height: 1; margin-bottom: 1px; }
+.meddicc-word { font-size: 10px; color: #6a8a6a; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.04em; }
+.meddicc-note { font-size: 12px; color: #7a9a7a; line-height: 1.5; }
+
+.coaching-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1e2e1e; }
+.coaching-item:last-child { border-bottom: none; }
+.coaching-num { width: 22px; height: 22px; border-radius: 50%; background: #1e3a1e; border: 1px solid #2e5a2e; color: #4a9a4a; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.coaching-text { font-size: 13px; color: #7a9a7a; line-height: 1.6; }
+.priority-item { display: flex; gap: 12px; padding: 8px 0; align-items: flex-start; }
+.priority-num { width: 22px; height: 22px; border-radius: 50%; background: #3a7a3a; color: #e8ede8; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+.loading-state { text-align: center; padding: 3rem; color: #6a8a6a; font-size: 14px; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #2a3a2a; border-top-color: #4a9a4a; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.divider-vs { display: flex; align-items: center; gap: 8px; }
+.divider-vs span { font-size: 11px; color: #3a5a3a; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img class="header-photo" src="https://media.licdn.com/dms/image/v2/D4E03AQEYx14eZYZ-Lg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1709137656391?e=1779926400&v=beta&t=dvBchmjERHqezgoKFMqifb72bbQCs3IgP9ijnoAh71o" alt="Antoine" />
+  <div class="header-text">
+    <h1>Coach by Antoine</h1>
+    <p>AI-powered sales call analysis</p>
+  </div>
+  <div class="header-badge">Powered by Claude</div>
+</div>
+
+<div class="container">
+  <div class="intro">
+    <h2>Analyze a call</h2>
+    <p>Paste a Gong transcript below to get a detailed coaching breakdown using TAPO, Command of the Message, and MEDDICC frameworks.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Call transcript</div>
+    <textarea id="transcript" placeholder="Paste the full call transcript here..."></textarea>
+
+    <div class="meta-grid" style="margin-top:14px;">
+      <div class="field-group">
+        <label for="rep-name">Rep name</label>
+        <input type="text" id="rep-name" placeholder="e.g. Sarah K." />
+      </div>
+      <div class="field-group">
+        <label for="rep-photo">Rep LinkedIn photo URL</label>
+        <input type="text" id="rep-photo" placeholder="https://media.licdn.com/..." />
+        <div class="field-hint">Right-click LinkedIn photo → Copy image address</div>
+      </div>
+      <div class="field-group">
+        <label for="rep-company">Rep's company domain</label>
+        <input type="text" id="rep-company" placeholder="e.g. pontera.com" />
+      </div>
+      <div class="field-group">
+        <label for="account-name">Prospect / account name</label>
+        <input type="text" id="account-name" placeholder="e.g. Acme Corp" />
+      </div>
+      <div class="field-group">
+        <label for="prospect-domain">Prospect company domain</label>
+        <input type="text" id="prospect-domain" placeholder="e.g. acmecorp.com" />
+      </div>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" onclick="analyzeCall()">
+      &#9654;&nbsp; Analyze call
+    </button>
+    <div class="error-msg" id="error-msg"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div id="results-inner"></div>
+  </div>
+</div>
+
+<script>
+function sc(s,m){const p=s/m;return p>=.75?'#4a9a4a':p>=.45?'#c8881a':'#e87a7a';}
+function bc(s,m){const p=s/m;return p>=.75?'badge-green':p>=.45?'badge-amber':'badge-red';}
+function mb(s){const c=s==='strong'?'badge-green':s==='partial'?'badge-amber':'badge-red';return`<span class="badge ${c}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`;}
+function logoUrl(domain){return domain?`https://img.logo.dev/${domain.trim()}?token=pk_TCWmRMuSRBeGBrBbT9BHhA&size=64`:'';} 
+function initials(name){return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+async function analyzeCall() {
+  const transcript = document.getElementById('transcript').value.trim();
+  const repName = document.getElementById('rep-name').value.trim() || 'Rep';
+  const repPhoto = document.getElementById('rep-photo').value.trim();
+  const repDomain = document.getElementById('rep-company').value.trim();
+  const accountName = document.getElementById('account-name').value.trim() || 'Prospect';
+  const prospectDomain = document.getElementById('prospect-domain').value.trim();
+  const btn = document.getElementById('analyze-btn');
+  const errEl = document.getElementById('error-msg');
+  const resultsEl = document.getElementById('results');
+  const inner = document.getElementById('results-inner');
+
+  errEl.style.display = 'none';
+  if (!transcript) { errEl.textContent = 'Please paste a transcript first.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+  resultsEl.className = 'results visible';
+  inner.innerHTML = '<div class="loading-state"><span class="spinner"></span> Running analysis against Antoine\'s frameworks...</div>';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 4000,
-        system: SYSTEM_PROMPT,
-        messages: [{
-          role: 'user',
-          content: `Rep: ${repName || 'Rep'}\nAccount: ${accountName || 'Prospect'}\n\nTRANSCRIPT:\n${transcript}`
-        }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript, repName, accountName })
     });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      return res.status(500).json({ error: err?.error?.message || 'Anthropic API error' });
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e?.error || `Server error ${res.status}`);
     }
-
-    const data = await response.json();
-    const text = data.content.filter(i => i.type === 'text').map(i => i.text).join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-
-    return res.status(200).json(parsed);
-  } catch (e) {
-    return res.status(500).json({ error: e.message || 'Internal server error' });
+    const d = await res.json();
+    renderResults(d, repName, repPhoto, repDomain, accountName, prospectDomain);
+  } catch(e) {
+    inner.innerHTML = '';
+    errEl.textContent = 'Error: ' + (e.message || 'Something went wrong. Please try again.');
+    errEl.style.display = 'block';
   }
+
+  btn.disabled = false;
+  btn.innerHTML = '&#9654;&nbsp; Analyze call';
 }
+
+function logoHtml(domain, alt) {
+  if (!domain) return '';
+  return `<div class="logo-wrap"><img src="${logoUrl(domain)}" alt="${alt}" onerror="this.parentElement.style.display='none'" /></div>`;
+}
+
+function repPhotoHtml(repPhoto, repName) {
+  if (repPhoto) return `<img class="rep-photo-sm" src="${repPhoto}" alt="${repName}" onerror="this.outerHTML='<div class=rep-photo-placeholder>${initials(repName)}</div>'" />`;
+  return `<div class="rep-photo-placeholder">${initials(repName)}</div>`;
+}
+
+function renderResults(d, repName, repPhoto, repDomain, accountName, prospectDomain) {
+  const el = document.getElementById('results-inner');
+  const cc = sc(d.overall_score, 100);
+  const talkOk = d.talk_ratio_estimate <= 50;
+
+  const repLogoHtml = logoHtml(repDomain, repName);
+  const prospectLogoHtml = logoHtml(prospectDomain, accountName);
+  const hasLogos = repDomain || prospectDomain;
+
+  const logosBlock = hasLogos ? `
+    <div class="report-logos">
+      ${repPhotoHtml(repPhoto, repName)}
+      ${repLogoHtml}
+      ${(repDomain && prospectDomain) ? '<div class="divider-vs"><span>vs</span></div>' : ''}
+      ${prospectLogoHtml}
+    </div>` : `<div class="report-logos">${repPhotoHtml(repPhoto, repName)}</div>`;
+
+  const buckets = (obj, keys) => keys.map(([k, label]) => {
+    const item = obj[k];
+    return `<div class="bucket">
+      <div class="bucket-header"><span class="bucket-name">${label}</span><span class="badge ${bc(item.score,10)}">${item.score}/10</span></div>
+      <div class="bucket-body">${item.finding}</div>
+      ${item.gap ? `<div class="gap-item">&#9651; ${item.gap}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+  <div class="card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;">
+      ${logosBlock}
+      <div class="score-circle" style="border-color:${cc}">
+        <span class="score-num" style="color:${cc}">${d.overall_score}</span>
+        <span class="score-lbl">/ 100</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:16px;font-weight:600;color:#e8ede8;margin-bottom:5px;">${repName} &mdash; ${accountName}</div>
+      <div style="font-size:13px;color:#7a9a7a;line-height:1.65;">${d.overall_summary}</div>
+      <div class="summary-meta">
+        <span class="badge ${talkOk?'badge-green':'badge-red'}">Rep talk: ~${d.talk_ratio_estimate}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">TAPO &mdash; upfront social contract</div>
+    ${buckets(d.tapo,[['time','Time'],['attendees','Attendees'],['purpose','Purpose'],['outcome','Outcome']])}
+  </div>
+
+  <div class="card">
+    <div class="section-title">Command of the message</div>
+    ${buckets(d.command_of_message,[['before_state','Before state'],['negative_consequences','Negative consequences'],['ideal_state','Ideal state'],['pbo','Positive business impact'],['required_capabilities','Required capabilities'],['positioning','Positioning'],['closing','Closing']])}
+  </div>
+
+  <div class="card">
+    <div class="section-title">Qualitative standards</div>
+    ${[['exec_priorities','Executive priorities'],['question_quality','Question quality'],['quantification','Quantification of impact'],['compelling_event','Compelling event'],['decision_authority','Decision authority']].map(([k,label]) => {
+      const item = d.qualitative[k];
+      return `<div class="bucket"><div class="bucket-header"><span class="bucket-name">${label}</span><span class="badge ${bc(item.score,10)}">${item.score}/10</span></div><div class="bucket-body">${item.finding}</div></div>`;
+    }).join('')}
+  </div>
+
+  <div class="card">
+    <div class="section-title">MEDDICC analysis</div>
+    <div class="meddicc-grid">
+      ${[['metrics','M','Metrics'],['economic_buyer','E','Economic buyer'],['decision_criteria','D','Decision criteria'],['decision_process','D','Decision process'],['identify_pain','I','Identify pain'],['champion','C','Champion'],['competition','C','Competition']].map(([k,letter,word]) => {
+        const item = d.meddicc[k];
+        const lc = item.status==='strong'?'#4a9a4a':item.status==='partial'?'#c8881a':'#e87a7a';
+        return `<div class="meddicc-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div><div class="meddicc-letter" style="color:${lc}">${letter}</div><div class="meddicc-word">${word}</div></div>
+            ${mb(item.status)}
+          </div>
+          <div class="meddicc-note">${item.note}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Key coaching moments</div>
+    ${d.top_coaching_moments.map((m,i)=>`<div class="coaching-item"><span class="coaching-num">${i+1}</span><span class="coaching-text">${m}</span></div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="section-title">Priorities for next call</div>
+    ${d.priorities_for_next_call.map((p,i)=>`<div class="priority-item"><span class="priority-num">${i+1}</span><span class="coaching-text">${p}</span></div>`).join('')}
+  </div>`;
+}
+</script>
+</body>
+</html>
