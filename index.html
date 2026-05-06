@@ -3,201 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Call Coaching</title>
+<title>Coach by Antoine</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
-.container { max-width: 720px; margin: 0 auto; }
-h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
-.subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; }
-.card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
-label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; }
-textarea { width: 100%; min-height: 160px; resize: vertical; font-size: 13px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; color: #1a1a1a; line-height: 1.5; font-family: inherit; }
-textarea:focus { outline: none; border-color: #999; }
-.meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-input[type="text"] { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; color: #1a1a1a; font-family: inherit; }
-input[type="text"]:focus { outline: none; border-color: #999; }
-.analyze-btn { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; background: #1a1a1a; color: #fff; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.analyze-btn:hover:not(:disabled) { background: #333; }
-.error-msg { color: #c0392b; font-size: 13px; padding: 10px 12px; background: #fdf0ef; border-radius: 8px; margin-top: 8px; display: none; line-height: 1.5; border: 1px solid #f5c6c2; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1f1a; color: #e8ede8; min-height: 100vh; }
+.header { background: #141814; border-bottom: 1px solid #2a3a2a; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 14px; }
+.header-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #4a9a4a; }
+.header-text h1 { font-size: 17px; font-weight: 600; color: #e8ede8; letter-spacing: -0.01em; }
+.header-text p { font-size: 12px; color: #6a8a6a; margin-top: 1px; }
+.header-badge { margin-left: auto; background: #1e3a1e; border: 1px solid #2e5a2e; color: #4a9a4a; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+.container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+.intro { margin-bottom: 1.5rem; }
+.intro h2 { font-size: 22px; font-weight: 600; color: #e8ede8; margin-bottom: 6px; }
+.intro p { font-size: 14px; color: #6a8a6a; line-height: 1.5; }
+.card { background: #1e261e; border: 1px solid #2a3a2a; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+.card-label { font-size: 12px; font-weight: 500; color: #4a9a4a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+textarea { width: 100%; min-height: 180px; resize: vertical; font-size: 13px; padding: 12px 14px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; line-height: 1.6; font-family: inherit; transition: border-color 0.2s; }
+textarea:focus { outline: none; border-color: #4a9a4a; }
+textarea::placeholder { color: #3a5a3a; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.field-group label { font-size: 12px; color: #6a8a6a; display: block; margin-bottom: 5px; }
+.field-hint { font-size: 11px; color: #3a5a3a; margin-top: 3px; }
+input[type="text"] { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; font-family: inherit; transition: border-color 0.2s; }
+input[type="text"]:focus { outline: none; border-color: #4a9a4a; }
+input[type="text"]::placeholder { color: #3a5a3a; }
+.analyze-btn { width: 100%; padding: 13px; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; background: #3a7a3a; color: #e8ede8; cursor: pointer; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.01em; transition: background 0.2s; }
+.analyze-btn:hover:not(:disabled) { background: #4a9a4a; }
+.analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.error-msg { color: #e87a7a; font-size: 13px; padding: 10px 14px; background: #2a1a1a; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #4a2a2a; line-height: 1.5; }
 .results { display: none; }
 .results.visible { display: block; }
-.section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
-.badge-green { background: #eaf3de; color: #3b6d11; }
-.badge-amber { background: #faeeda; color: #854f0b; }
-.badge-red { background: #fcebeb; color: #a32d2d; }
-.bucket { border: 1px solid #eee; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
-.bucket-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.bucket-name { font-size: 13px; font-weight: 500; }
-.bucket-body { font-size: 13px; color: #555; line-height: 1.6; }
-.gap-item { font-size: 12px; color: #c0392b; display: flex; gap: 6px; margin-top: 5px; align-items: flex-start; }
-.score-circle { width: 64px; height: 64px; border-radius: 50%; border: 3px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
-.score-circle .num { font-size: 20px; font-weight: 500; }
-.score-circle .lbl { font-size: 9px; color: #888; }
-.meddicc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.meddicc-item { border: 1px solid #eee; border-radius: 8px; padding: 8px 10px; }
-.loading-state { text-align: center; padding: 2rem; color: #666; font-size: 14px; }
-.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.coaching-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
-.coaching-item:last-child { border-bottom: none; }
-.coaching-num { font-size: 12px; font-weight: 500; color: #888; min-width: 18px; padding-top: 1px; }
-.coaching-text { font-size: 13px; color: #555; line-height: 1.5; }
-.priority-item { display: flex; gap: 10px; padding: 6px 0; align-items: flex-start; }
-.priority-num { font-size: 12px; font-weight: 500; background: #f0f0f0; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #555; }
-</style>
-</head>
-<body>
-<div class="container">
-  <h1>Call coaching</h1>
-  <p class="subtitle">Paste a transcript to get a detailed coaching analysis</p>
-
-  <div class="card">
-    <label for="transcript">Call transcript</label>
-    <textarea id="transcript" placeholder="Paste the full call transcript here..."></textarea>
-    <div class="meta-row">
-      <div>
-        <label for="rep-name">Rep name</label>
-        <input type="text" id="rep-name" placeholder="e.g. Sarah K." />
-      </div>
-      <div>
-        <label for="account-name">Prospect / account</label>
-        <input type="text" id="account-name" placeholder="e.g. Acme Corp" />
-      </div>
-    </div>
-    <button class="analyze-btn" id="analyze-btn" onclick="analyzeCall()">
-      &#9654; Analyze call
-    </button>
-    <div class="error-msg" id="error-msg"></div>
-  </div>
-
-  <div class="results" id="results">
-    <div id="results-inner"></div>
-  </div>
-</div>
-
-<script>
-function sc(s,m){const p=s/m;return p>=.75?'#3b6d11':p>=.45?'#854f0b':'#a32d2d';}
-function bc(s,m){const p=s/m;return p>=.75?'badge-green':p>=.45?'badge-amber':'badge-red';}
-function mb(status){const c=status==='strong'?'badge-green':status==='partial'?'badge-amber':'badge-red';return `<span class="badge ${c}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>`;}
-
-async function analyzeCall() {
-  const transcript = document.getElementById('transcript').value.trim();
-  const repName = document.getElementById('rep-name').value.trim() || 'Rep';
-  const accountName = document.getElementById('account-name').value.trim() || 'Prospect';
-  const btn = document.getElementById('analyze-btn');
-  const errEl = document.getElementById('error-msg');
-  const resultsEl = document.getElementById('results');
-  const inner = document.getElementById('results-inner');
-
-  errEl.style.display = 'none';
-  if (!transcript) { errEl.textContent = 'Please paste a transcript first.'; errEl.style.display = 'block'; return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
-  resultsEl.className = 'results visible';
-  inner.innerHTML = '<div class="loading-state"><span class="spinner"></span> Running analysis against your frameworks...</div>';
-
-  try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript, repName, accountName })
-    });
-
-    if (!res.ok) {
-      const e = await res.json().catch(()=>({}));
-      throw new Error(e?.error || `Server error ${res.status}`);
-    }
-
-    const d = await res.json();
-    renderResults(d, repName, accountName);
-  } catch(e) {
-    inner.innerHTML = '';
-    errEl.textContent = 'Error: ' + (e.message || 'Something went wrong. Please try again.');
-    errEl.style.display = 'block';
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '&#9654; Analyze call';
-}
-
-function renderResults(d, repName, accountName) {
-  const el = document.getElementById('results-inner');
-  const cc = sc(d.overall_score,100);
-  const talkOk = d.talk_ratio_estimate <= 50;
-
-  const buckets = (obj, keys) => keys.map(([k,label]) => {
-    const item = obj[k];
-    return `<div class="bucket">
-      <div class="bucket-header"><span class="bucket-name">${label}</span><span class="badge ${bc(item.score,10)}">${item.score}/10</span></div>
-      <div class="bucket-body">${item.finding}</div>
-      ${item.gap ? `<div class="gap-item">&#9651; ${item.gap}</div>` : ''}
-    </div>`;
-  }).join('');
-
-  el.innerHTML = `
-  <div class="card">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
-      <div>
-        <div style="font-size:16px;font-weight:500;margin-bottom:4px;">${repName} &mdash; ${accountName}</div>
-        <div style="font-size:13px;color:#555;line-height:1.6">${d.overall_summary}</div>
-      </div>
-      <div class="score-circle" style="border-color:${cc}">
-        <span class="num" style="color:${cc}">${d.overall_score}</span>
-        <span class="lbl">/ 100</span>
-      </div>
-    </div>
-    <span class="badge ${talkOk?'badge-green':'badge-red'}">Rep talk: ~${d.talk_ratio_estimate}%</span>
-  </div>
-
-  <div class="card">
-    <div class="section-title">TAPO &mdash; upfront social contract</div>
-    ${buckets(d.tapo,[['time','Time'],['attendees','Attendees'],['purpose','Purpose'],['outcome','Outcome']])}
-  </div>
-
-  <div class="card">
-    <div class="section-title">Command of the message</div>
-    ${buckets(d.command_of_message,[['before_state','Before state'],['negative_consequences','Negative consequences'],['ideal_state','Ideal state'],['pbo','Positive business impact'],['required_capabilities','Required capabilities'],['positioning','Positioning'],['closing','Closing']])}
-  </div>
-
-  <div class="card">
-    <div class="section-title">Qualitative standards</div>
-    ${[['exec_priorities','Executive priorities'],['question_quality','Question quality'],['quantification','Quantification of impact'],['compelling_event','Compelling event'],['decision_authority','Decision authority']].map(([k,label]) => {
-      const item = d.qualitative[k];
-      return `<div class="bucket"><div class="bucket-header"><span class="bucket-name">${label}</span><span class="badge ${bc(item.score,10)}">${item.score}/10</span></div><div class="bucket-body">${item.finding}</div></div>`;
-    }).join('')}
-  </div>
-
-  <div class="card">
-    <div class="section-title">MEDDICC analysis</div>
-    <div class="meddicc-grid">
-      ${[['metrics','M','Metrics'],['economic_buyer','E','Economic buyer'],['decision_criteria','D','Decision criteria'],['decision_process','D','Decision process'],['identify_pain','I','Identify pain'],['champion','C','Champion'],['competition','C','Competition']].map(([k,letter,word]) => {
-        const item = d.meddicc[k];
-        const lc = item.status==='strong'?'#3b6d11':item.status==='partial'?'#854f0b':'#a32d2d';
-        return `<div class="meddicc-item">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-            <div><div style="font-size:18px;font-weight:500;color:${lc}">${letter}</div><div style="font-size:11px;color:#888;margin-bottom:4px">${word}</div></div>
-            ${mb(item.status)}
-          </div>
-          <div style="font-size:12px;color:#555;line-height:1.5">${item.note}</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">Key coaching moments</div>
-    ${d.top_coaching_moments.map((m,i) => `<div class="coaching-item"><span class="coaching-num">${i+1}</span><span class="coaching-text">${m}</span></div>`).join('')}
-  </div>
-
-  <div class="card">
-    <div class="section-title">Priorities for next call</div>
-    ${d.priorities_for_next_call.map((p,i) => `<div class="priority-item"><span class="priority-num">${i+1}</span><span class="coaching-text">${p}</span></div>`).join('')}
-  </div>`;
-}
-</script>
-</body>
-</html>
+.report-logos { display: flex; align-items: center; gap: 10px; }
+.logo-wrap { width: 44px; height: 44px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #2a3a2a; flex-shrink: 0; }
+.logo-wrap img { width: 36px; height: 36px; object-fit: contain; }
+.rep-photo-sm { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #4a9a4a; flex-shrink: 0; }
+.rep-photo-placeholder { width: 44px; height: 44px; border-radius: 50%; background: #1e3a1e; border: 2px solid #2e5a2e; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #4a9a4a; flex-shrink: 0; }
+.summary-text h3 { font-size: 16px; font-weight: 600; color: #e8ede8; margin-bottom: 5px; }
+.summary-text p { font-size: 13px; color: #7a9a7a; line-height: 1.65; }
+.summary-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.score-circle { width: 70px; height: 70px; border-radius: 50%; border: 3px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.score-num { font-size: 22px; font-weight: 700; line-height: 1; }
+.score-lbl { font-size: 9px; color: #6a8a6a; margin-top: 1px; }
+.section-title { font-size: 11px; font-weight: 600; color: #4a9a4a; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: #2a3
