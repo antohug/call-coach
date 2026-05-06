@@ -1,40 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Coach by Antoine</title>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1f1a; color: #e8ede8; min-height: 100vh; }
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-.header { background: #141814; border-bottom: 1px solid #2a3a2a; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 14px; }
-.header-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #4a9a4a; }
-.header-text h1 { font-size: 17px; font-weight: 600; color: #e8ede8; letter-spacing: -0.01em; }
-.header-text p { font-size: 12px; color: #6a8a6a; margin-top: 1px; }
-.header-badge { margin-left: auto; background: #1e3a1e; border: 1px solid #2e5a2e; color: #4a9a4a; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+  const { transcript, repName, accountName } = req.body;
 
-.container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
-.intro { margin-bottom: 1.5rem; }
-.intro h2 { font-size: 22px; font-weight: 600; color: #e8ede8; margin-bottom: 6px; }
-.intro p { font-size: 14px; color: #6a8a6a; line-height: 1.5; }
+  if (!transcript) {
+    return res.status(400).json({ error: 'Transcript is required' });
+  }
 
-.card { background: #1e261e; border: 1px solid #2a3a2a; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
-.card-label { font-size: 12px; font-weight: 500; color: #4a9a4a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  const SYSTEM_PROMPT = `You are an elite sales coach. Analyze the sales call transcript using these exact frameworks and return ONLY valid JSON — no preamble, no markdown, no explanation.
 
-textarea { width: 100%; min-height: 180px; resize: vertical; font-size: 13px; padding: 12px 14px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; line-height: 1.6; font-family: inherit; transition: border-color 0.2s; }
-textarea:focus { outline: none; border-color: #4a9a4a; }
-textarea::placeholder { color: #3a5a3a; }
+TAPO upfront social contract: Time (confirmed availability?), Attendees (all on call?), Purpose (goal stated and agreed, co-built agenda?), Outcome (clear exit criteria and next step stated upfront?).
 
-.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-.field-group label { font-size: 12px; color: #6a8a6a; display: block; margin-bottom: 5px; }
-.field-hint { font-size: 11px; color: #3a5a3a; margin-top: 3px; }
-input[type="text"] { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #2a3a2a; border-radius: 10px; background: #141814; color: #e8ede8; font-family: inherit; transition: border-color 0.2s; }
-input[type="text"]:focus { outline: none; border-color: #4a9a4a; }
-input[type="text"]::placeholder { color: #3a5a3a; }
+Command of the Message discovery: Before State (current situation + strategic priorities understood?), Negative Consequences (problem, business impact, personal impact, metrics?), Ideal State (prospect painted their own perfect scenario?), PBO (success metrics, measurement, timeline, urgency?), Required Capabilities (unique needs, integrations, decision process?), Positioning (solution tied to their specific pain, differentiated, proof point, customer story?), Closing (vision match reached? next step scheduled? disqualification handled?).
 
-.analyze-btn { width: 100%; padding: 13px; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; background: #3a7a3a; color: #e8ede8; cursor: pointer; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.01em; transition: background 0.2s; }
-.analyze-btn:hover:not(:disabled) { background: #4a9a4a; }
+Qualitative: exec priorities alignment, talk ratio estimate (rep % only), question quality (lawyer-style investigative follow-ups?), quantification (impact of change AND status quo?), compelling event identified?, decision authority mapped?.
+
+MEDDICC: Metrics.analyze-btn:hover:not(:disabled) { background: #4a9a4a; }
 .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .error-msg { color: #e87a7a; font-size: 13px; padding: 10px 14px; background: #2a1a1a; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #4a2a2a; line-height: 1.5; }
